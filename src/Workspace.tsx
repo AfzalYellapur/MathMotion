@@ -8,11 +8,17 @@ function Workspace() {
     const [messages, setMessages] = useState<
         { sender: 'user' | 'ai'; text: string }[]
     >([]);
-    const { ws, status } = useBinderKernel();
+    const { ws, status, connect } = useBinderKernel();
     const [code, setCode] = useState('');
     const [videoData, setVideoData] = useState<string | null>(null);
     const [terminalOutput, setTerminalOutput] = useState<string>('');
     const ansiConverter = new AnsiToHtml();
+
+    useEffect(() => {
+        if (status === "Kernel disconnected") {
+            setTerminalOutput(prev => prev + "\n\nKernel has shut down due to inactivity.\n\n");
+        }
+    }, [status]);
 
 
     useEffect(() => {
@@ -29,7 +35,7 @@ function Workspace() {
                 if (text.startsWith("VIDEO:")) {
                     const base64 = text.replace("VIDEO:", "").trim();
                     setVideoData("data:video/mp4;base64," + base64);
-                    console.log("Received video data.");
+                    setTerminalOutput(prev => prev + "\nVideo Generated\n");
                 }
                 else {
                     // Append any regular output to terminal
@@ -59,9 +65,9 @@ function Workspace() {
     const sendCodeToKernel = () => {
         if (!ws || ws.readyState !== WebSocket.OPEN) {
             console.log("WebSocket not ready");
+            console.log(status);
             return;
         }
-        // setTerminalOutput('');
 
         const msg = {
             header: {
@@ -102,7 +108,8 @@ function Workspace() {
                         <div className="flex-1 overflow-y-auto mb-2 border p-2">
                             {messages.map((msg, idx) => (
                                 <p key={idx} className="mb-1">
-                                    <strong>{msg.sender === 'user' ? 'You' : 'AI'}:</strong> {msg.text}
+                                    <strong>{msg.sender === 'user' ? 'You' : 'AI'}:</strong>
+                                    {msg.text}
                                 </p>
                             ))}
                         </div>
@@ -128,16 +135,38 @@ function Workspace() {
                 <div className="w-2/3 border border-black p-2 flex flex-col">
                     <div className="flex gap-x-2 mb-2">
                         <button className={`p-[4px] ${view === "editor" ? 'bg-red-600' : 'bg-red-300'}  text-white rounded-[4px] `}
-                            onClick={() => setView('editor')}>Editor</button>
-                        <button className={`p-[4px] ${view === "video" ? 'bg-blue-600' : 'bg-blue-300'} text-white rounded-[4px] `} onClick={() => setView('video')}>Preview</button>
-                        {view === 'editor' && (
+                            onClick={() => setView('editor')}>
+                            Editor
+                        </button>
+                        <button className={`p-[4px] ${view === "video" ? 'bg-blue-600' : 'bg-blue-300'} text-white rounded-[4px] `} onClick={() => setView('video')}>
+                            Preview
+                        </button>
+
+                        <div className="mb-2 ml-auto mr-auto text-sm font-semibold text-gray-700">
+                            Kernel Status:{" "}
+                            <span className={
+                                status === 'Kernel Ready' ? 'text-green-600' :
+                                    (status === 'Connecting') || (status === 'Setting Up Environment') ? 'text-yellow-500' :
+                                        'text-red-600'
+                            }>
+                                {status}
+                            </span>
+                        </div>
+                        {status === "Kernel disconnected" ?
+                            <button
+                            onClick={connect}
+                            className="ml-auto p-[4px] bg-green-400 text-white rounded-[4px]">
+                                Reconnect
+                            </button>
+                                    :
                             <button
                                 onClick={sendCodeToKernel}
                                 className="ml-auto p-[4px] bg-green-800 text-white rounded-[4px]"
                             >
                                 Generate
                             </button>
-                        )}
+                        }
+
                     </div>
 
                     <div className="flex-1 border overflow-hidden flex flex-col">
