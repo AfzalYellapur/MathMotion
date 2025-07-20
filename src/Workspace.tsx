@@ -1,18 +1,34 @@
 import { useState, useEffect } from "react";
 import { useBinderKernel } from "./hooks/useBinderKernel";
-import AnsiToHtml from 'ansi-to-html';
+import { useLocation } from 'react-router-dom';
+
+function stripAnsiCodes(text: string): string {
+    return text.replace(
+        /\x1b\[[0-9;]*m/g,
+        ''
+    );
+}
+
 
 function Workspace() {
+
     const [view, setView] = useState<'editor' | 'video'>('editor');
-    const [chatInput, setChatInput] = useState('');
+    const location = useLocation();
+    const initialPrompt = location.state?.prompt || '';
+    const [chatInput, setChatInput] = useState(initialPrompt);
     const [messages, setMessages] = useState<
         { sender: 'user' | 'ai'; text: string }[]
     >([]);
     const { ws, status, connect } = useBinderKernel();
-    const [code, setCode] = useState('');
+    const [userCode, setUserCode] = useState('');
     const [videoData, setVideoData] = useState<string | null>(null);
     const [terminalOutput, setTerminalOutput] = useState<string>('');
-    const ansiConverter = new AnsiToHtml();
+
+    useEffect(() => {
+        const el = document.getElementById("terminal");
+        if (el) el.scrollTop = el.scrollHeight;
+    }, [terminalOutput]);
+
 
     useEffect(() => {
         if (status === "Kernel disconnected") {
@@ -39,15 +55,14 @@ function Workspace() {
                 }
                 else {
                     // Append any regular output to terminal
-                    setTerminalOutput(prev => prev + text);
+                    setTerminalOutput(prev => prev + "\n" + stripAnsiCodes(text));
                 }
             }
 
             if (msgType === "error") {
                 const { ename, evalue, traceback } = msg.content;
                 const errorText = `\nKernel Error: ${ename}: ${evalue}\n${(traceback || []).join("\n")}`;
-                setTerminalOutput(prev => prev + ansiConverter.toHtml(errorText));
-                console.error(errorText);
+                setTerminalOutput(prev => prev + "\n" + stripAnsiCodes(errorText));
             }
 
         };
@@ -55,23 +70,47 @@ function Workspace() {
 
         ws.addEventListener("message", handleMessage);
 
+
         return () => {
             ws.removeEventListener("message", handleMessage);
         };
     }, [ws]);
 
+    const extractManimClass = (code: string): string | null => {
+        const classMatch = code.match(/(\w+)\s*\(\)\s*\.render\s*\(\s*\)/);
+        return classMatch ? classMatch[1] : null;
+    };
 
 
     const sendCodeToKernel = () => {
+
+        const codeclass = extractManimClass(userCode);
+        if (!codeclass) {
+            alert("Your code must define a class extending Scene, like: class MyScene(Scene):");
+            return;
+        }
+
+        const code = `
+from manim import *
+import base64
+from manim import tempconfig
+config.quality = "medium_quality"  # corresponds to 720p30
+config.disable_caching = True
+
+${userCode}
+
+with open("media/videos/720p30/${codeclass}.mp4", "rb") as f:
+    data = base64.b64encode(f.read()).decode()
+    print("VIDEO:" + data)
+`;
+
         if (!ws || ws.readyState !== WebSocket.OPEN) {
-            console.log("WebSocket not ready");
-            console.log(status);
             return;
         }
 
         const msg = {
             header: {
-                msg_id: "1",
+                msg_id: Date.now().toString(),
                 username: "user",
                 session: "sess",
                 msg_type: "execute_request",
@@ -90,16 +129,18 @@ function Workspace() {
         };
 
         ws.send(JSON.stringify(msg));
-        console.log("Code sent to kernel");
     };
 
-    const handleSend = () => {
+    const handleprompt = () => {
         if (chatInput.trim() === '') return;
         setMessages(prev => [...prev,
         { sender: 'user', text: chatInput },
         { sender: 'ai', text: `You said: ${chatInput}` }]);
         setChatInput('');
     }
+
+    useEffect(handleprompt,[])
+
     return (
         <>
             <div className="flex h-screen">
@@ -122,7 +163,7 @@ function Workspace() {
                             className="flex-1 border p-2 rounded resize-none h-24 overflow-y-auto"
                         />
                         <button
-                            onClick={handleSend}
+                            onClick={handleprompt}
                             className="h-24 px-4 bg-blue-500 text-white rounded"
                         >
                             Send
@@ -154,11 +195,11 @@ function Workspace() {
                         </div>
                         {status === "Kernel disconnected" ?
                             <button
-                            onClick={connect}
-                            className="ml-auto p-[4px] bg-green-400 text-white rounded-[4px]">
+                                onClick={connect}
+                                className="ml-auto p-[4px] bg-green-400 text-white rounded-[4px]">
                                 Reconnect
                             </button>
-                                    :
+                            :
                             <button
                                 onClick={sendCodeToKernel}
                                 className="ml-auto p-[4px] bg-green-800 text-white rounded-[4px]"
@@ -173,8 +214,8 @@ function Workspace() {
                         {view === 'editor' ? (
                             <>
                                 <textarea
-                                    value={code}
-                                    onChange={(e) => setCode(e.target.value)}
+                                    value={userCode}
+                                    onChange={(e) => setUserCode(e.target.value)}
                                     className="flex-1 resize-none w-full p-2 outline-none" />
                             </>
                         ) : (
@@ -188,7 +229,11 @@ function Workspace() {
                         )}
                     </div>
 
-                    <div className="mt-1 h-24 font-mono text-xs p-2 overflow-y-auto border whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: terminalOutput }} />
+                    <div
+                        id="terminal"
+                        className="mt-1 h-24 font-mono bg-black text-green-300 text-xs p-2 overflow-y-auto border whitespace-pre-wrap" >
+                        {terminalOutput}
+                    </div>
 
                 </div>
             </div >

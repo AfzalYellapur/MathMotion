@@ -6,8 +6,8 @@ function Landing() {
     const navigate=useNavigate();
     
     const handleClick= ()=>{
-        console.log(userprompt);
-        navigate("/workspace");
+        navigate('/workspace', { state: { prompt: userprompt } });
+
     }
   return (
     <>  

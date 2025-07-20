@@ -60,7 +60,6 @@ export function useBinderKernel() {
     };
 
     socket.onclose = () => {
-      console.log("WebSocket closed");
       setStatus("Kernel disconnected");
       setWs(null);
     };
