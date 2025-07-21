@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useBinderKernel } from "./hooks/useBinderKernel";
+import { useBinderKernel } from "../hooks/useBinderKernel";
 import { useLocation } from 'react-router-dom';
 
 function stripAnsiCodes(text: string): string {

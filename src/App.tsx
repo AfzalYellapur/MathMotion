@@ -1,6 +1,6 @@
 import { Routes, Route } from 'react-router-dom'
-import Landing from './Landing'
-import Workspace from './Workspace'
+import Landing from './Components/Landing'
+import Workspace from './Components/Workspace'
 
 
 function App() {
