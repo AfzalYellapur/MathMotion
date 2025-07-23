@@ -75,11 +75,11 @@ export default function MathMotionLanding() {
             </div>
 
             <div className="flex items-center gap-2">
-              <button className="text-gray-400 hover:text-white text-sm px-3 py-2 rounded-md hover:bg-gray-800/50 flex items-center">
+              <button onClick={() => window.location.href = "/login"} className="text-gray-400 hover:text-white text-sm px-3 py-2 rounded-md hover:bg-gray-800/50 flex items-center">
                 <LogIn className="h-4 w-4 mr-2" />
                 Login
               </button>
-              <button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-sm px-3 py-2 rounded-md flex items-center">
+              <button onClick={() => window.location.href = "/signup"} className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-sm px-3 py-2 rounded-md flex items-center">
                 <UserPlus className="h-4 w-4 mr-2" />
                 Sign Up
               </button>
