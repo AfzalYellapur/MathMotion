@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-export function useBinderKernel() {
+export default function useBinderKernel() {
   const [ws, setWs] = useState<WebSocket | null>(null);
   const [status, setStatus] = useState("Not Ready");
 

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useBinderKernel } from "../hooks/useBinderKernel";
+import  useBinderKernel  from "../hooks/useBinderKernel";
 import { useLocation } from 'react-router-dom';
 
 function stripAnsiCodes(text: string): string {
@@ -10,7 +10,7 @@ function stripAnsiCodes(text: string): string {
 }
 
 
-function Workspace() {
+function Workspace_old() {
 
     const [view, setView] = useState<'editor' | 'video'>('editor');
     const location = useLocation();
@@ -241,4 +241,4 @@ with open("media/videos/720p30/${codeclass}.mp4", "rb") as f:
     )
 }
 
-export default Workspace;
+export default Workspace_old;
