@@ -1,8 +1,30 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
-import { Send, History, Clock, Sparkles, LogIn, UserPlus } from "lucide-react"
+import { useState, useRef, useEffect } from "react"
+import {
+  Send,
+  History,
+  Clock,
+  Sparkles,
+  Play,
+  Download,
+  Copy,
+  Code,
+  Video,
+  Loader2,
+  CheckCircle,
+  XCircle,
+  Menu,
+  ArrowLeft,LogIn,UserPlus
+} from "lucide-react"
+
+interface ChatMessage {
+  id: string
+  type: "user" | "assistant"
+  content: string
+  timestamp: string
+}
 
 interface ChatHistoryItem {
   id: string
@@ -11,10 +33,29 @@ interface ChatHistoryItem {
   status: "completed" | "processing" | "failed"
 }
 
+interface GenerationState {
+  isGenerating: boolean
+  videoStatus: "idle" | "generating" | "completed" | "failed"
+  codeStatus: "idle" | "generating" | "completed" | "failed"
+  videoProgress: number
+  codeProgress: number
+}
+
 export default function MathMotionLanding() {
   const [prompt, setPrompt] = useState("")
   const [hoverSidebar, setHoverSidebar] = useState(false)
-  const [chatHistory, setChatHistory] = useState<ChatHistoryItem[]>([
+  const [showSplitView, setShowSplitView] = useState(false)
+  const [activeTab, setActiveTab] = useState<"video" | "code">("video")
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([])
+  const [generationState, setGenerationState] = useState<GenerationState>({
+    isGenerating: false,
+    videoStatus: "idle",
+    codeStatus: "idle",
+    videoProgress: 0,
+    codeProgress: 0,
+  })
+
+  const [chatHistory] = useState<ChatHistoryItem[]>([
     {
       id: "1",
       prompt: "Create an animation showing the derivative of x²",
@@ -35,21 +76,407 @@ export default function MathMotionLanding() {
     },
   ])
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [generatedCode, setGeneratedCode] = useState("")
+  const [generatedVideoUrl, setGeneratedVideoUrl] = useState("")
+  const chatEndRef = useRef<HTMLDivElement>(null)
+
+  const scrollToBottom = () => {
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  }
+
+  useEffect(() => {
+    scrollToBottom()
+  }, [chatMessages])
+
+  const simulateGeneration = async (userPrompt: string) => {
+    setGenerationState({
+      isGenerating: true,
+      videoStatus: "generating",
+      codeStatus: "generating",
+      videoProgress: 0,
+      codeProgress: 0,
+    })
+
+    // Add user message
+    const userMessage: ChatMessage = {
+      id: Date.now().toString(),
+      type: "user",
+      content: userPrompt,
+      timestamp: new Date().toLocaleTimeString(),
+    }
+    setChatMessages((prev) => [...prev, userMessage])
+
+    // Add assistant thinking message
+    const thinkingMessage: ChatMessage = {
+      id: (Date.now() + 1).toString(),
+      type: "assistant",
+      content: "I'll create a math animation for you. Let me generate the code and render the video...",
+      timestamp: new Date().toLocaleTimeString(),
+    }
+    setChatMessages((prev) => [...prev, thinkingMessage])
+
+    // Simulate code generation progress
+    const codeInterval = setInterval(() => {
+      setGenerationState((prev) => {
+        const newProgress = Math.min(prev.codeProgress + Math.random() * 15, 100)
+        if (newProgress >= 100) {
+          clearInterval(codeInterval)
+          return {
+            ...prev,
+            codeProgress: 100,
+            codeStatus: "completed",
+          }
+        }
+        return { ...prev, codeProgress: newProgress }
+      })
+    }, 200)
+
+    // Simulate video generation progress
+    const videoInterval = setInterval(() => {
+      setGenerationState((prev) => {
+        const newProgress = Math.min(prev.videoProgress + Math.random() * 10, 100)
+        if (newProgress >= 100) {
+          clearInterval(videoInterval)
+          return {
+            ...prev,
+            videoProgress: 100,
+            videoStatus: "completed",
+          }
+        }
+        return { ...prev, videoProgress: newProgress }
+      })
+    }, 300)
+
+    // Generate dummy code after 2 seconds
+    setTimeout(() => {
+      const dummyCode = `from manim import *
+
+class DerivativeAnimation(Scene):
+    def construct(self):
+        # Create the function f(x) = x²
+        func_text = MathTex(r"f(x) = x^2").to_edge(UP)
+        self.play(Write(func_text))
+        
+        # Create axes
+        axes = Axes(
+            x_range=[-3, 3, 1],
+            y_range=[-1, 9, 1],
+            x_length=6,
+            y_length=6,
+        )
+        
+        # Create the parabola
+        parabola = axes.plot(lambda x: x**2, color=BLUE)
+        parabola_label = axes.get_graph_label(parabola, "x^2")
+        
+        self.play(Create(axes))
+        self.play(Create(parabola), Write(parabola_label))
+        
+        # Show derivative calculation
+        derivative_text = MathTex(r"f'(x) = 2x").next_to(func_text, DOWN)
+        self.play(Write(derivative_text))
+        
+        self.wait(2)`
+
+      setGeneratedCode(dummyCode)
+    }, 2000)
+
+    // Generate dummy video URL after 4 seconds
+    setTimeout(() => {
+      setGeneratedVideoUrl("/placeholder.svg?height=400&width=600&text=Math+Animation")
+    }, 4000)
+
+    // Complete generation after 5 seconds
+    setTimeout(() => {
+      setGenerationState((prev) => ({
+        ...prev,
+        isGenerating: false,
+      }))
+
+      // Add completion message
+      const completionMessage: ChatMessage = {
+        id: (Date.now() + 2).toString(),
+        type: "assistant",
+        content: "✅ Animation generated successfully! You can view the video and code in the panels on the right.",
+        timestamp: new Date().toLocaleTimeString(),
+      }
+      setChatMessages((prev) => [...prev, completionMessage])
+    }, 5000)
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!prompt.trim()) return
 
-    // Add to chat history
-    const newItem: ChatHistoryItem = {
-      id: Date.now().toString(),
-      prompt: prompt.trim(),
-      timestamp: "Just now",
-      status: "processing",
-    }
-    setChatHistory((prev) => [newItem, ...prev])
-    setPrompt("")
+    const userPrompt = prompt.trim()
+    // Do NOT clear the prompt here, so it persists when returning to main view
+    setShowSplitView(true)
+
+    await simulateGeneration(userPrompt)
   }
 
+  const copyCode = () => {
+    navigator.clipboard.writeText(generatedCode)
+  }
+
+  const downloadVideo = () => {
+    console.log("Downloading video...")
+  }
+
+  const StatusIndicator = ({ status, progress }: { status: string; progress: number }) => {
+    switch (status) {
+      case "generating":
+        return (
+          <div className="flex items-center gap-2 text-yellow-400">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            <span className="text-sm">Generating... {Math.round(progress)}%</span>
+          </div>
+        )
+      case "completed":
+        return (
+          <div className="flex items-center gap-2 text-green-400">
+            <CheckCircle className="h-4 w-4" />
+            <span className="text-sm">Completed</span>
+          </div>
+        )
+      case "failed":
+        return (
+          <div className="flex items-center gap-2 text-red-400">
+            <XCircle className="h-4 w-4" />
+            <span className="text-sm">Failed</span>
+          </div>
+        )
+      default:
+        return null
+    }
+  }
+
+  if (showSplitView) {
+    return (
+      <div className="min-h-screen bg-gray-950 text-white">
+        {/* Navbar */}
+        <nav className="border-b border-gray-800 bg-gray-950/80 backdrop-blur-sm sticky top-0 z-50">
+          <div className="flex items-center justify-between px-4 py-3">
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setShowSplitView(false)}
+                className="text-gray-400 hover:text-white p-2 rounded-md hover:bg-gray-800/50 flex items-center gap-2"
+              >
+                <ArrowLeft className="h-5 w-5" />
+                <span className="sr-only">Back to Home</span>
+              </button>
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                <Sparkles className="h-4 w-4 text-white" />
+              </div>
+              <h1 className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                MathMotion
+              </h1>
+              <span className="text-xs bg-blue-600/20 text-blue-400 px-2 py-1 rounded-full border border-blue-600/30">
+                Demo
+              </span>
+            </div>
+
+            <div className="flex items-center gap-4">
+              <div className="hidden sm:flex items-center gap-2">
+                <button className="text-gray-400 hover:text-white text-sm px-3 py-2 rounded-md hover:bg-gray-800/50">
+                  Examples
+                </button>
+                <button className="text-gray-400 hover:text-white text-sm px-3 py-2 rounded-md hover:bg-gray-800/50">
+                  Docs
+                </button>
+              </div>
+              <button className="text-gray-400 hover:text-white p-2 rounded-md hover:bg-gray-800/50">
+                <Menu className="h-5 w-5" />
+              </button>
+            </div>
+          </div>
+        </nav>
+
+        <div className="flex h-[calc(100vh-73px)]">
+          {/* Chat Panel */}
+          <div className="w-1/2 border-r border-gray-800 flex flex-col">
+            {/* Chat Header */}
+            <div className="p-4 border-b border-gray-800">
+              <div className="flex items-center gap-2 text-white">
+                <History className="h-5 w-5" />
+                <h2 className="font-semibold">Chat</h2>
+              </div>
+            </div>
+
+            {/* Chat Messages */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+              {chatMessages.map((message) => (
+                <div key={message.id} className={`flex ${message.type === "user" ? "justify-end" : "justify-start"}`}>
+                  <div
+                    className={`max-w-[80%] rounded-lg p-3 ${
+                      message.type === "user"
+                        ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white"
+                        : "bg-gray-800 text-gray-100"
+                    }`}
+                  >
+                    <p className="text-sm">{message.content}</p>
+                    <p className="text-xs opacity-70 mt-1">{message.timestamp}</p>
+                  </div>
+                </div>
+              ))}
+              <div ref={chatEndRef} />
+            </div>
+
+            {/* Chat Input */}
+            <div className="p-4 border-t border-gray-800">
+              <form onSubmit={handleSubmit} className="flex gap-2">
+                <input
+                  type="text"
+                  value={prompt}
+                  onChange={(e) => setPrompt(e.target.value)}
+                  placeholder="Ask a follow-up question..."
+                  className="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                />
+                <button
+                  type="submit"
+                  disabled={!prompt.trim() || generationState.isGenerating}
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 p-2 rounded-lg"
+                >
+                  <Send className="h-4 w-4" />
+                </button>
+              </form>
+            </div>
+          </div>
+
+          {/* Content Panel */}
+          <div className="w-1/2 flex flex-col">
+            <div className="border-b border-gray-800">
+              <div className="flex">
+                <button
+                  onClick={() => setActiveTab("video")}
+                  className={`flex-1 px-4 py-3 text-sm font-medium flex items-center justify-center gap-2 ${
+                    activeTab === "video"
+                      ? "text-blue-400 border-b-2 border-blue-400 bg-gray-900/50"
+                      : "text-gray-400 hover:text-white"
+                  }`}
+                >
+                  <Video className="h-4 w-4" />
+                  Video
+                  <StatusIndicator status={generationState.videoStatus} progress={generationState.videoProgress} />
+                </button>
+                <button
+                  onClick={() => setActiveTab("code")}
+                  className={`flex-1 px-4 py-3 text-sm font-medium flex items-center justify-center gap-2 ${
+                    activeTab === "code"
+                      ? "text-blue-400 border-b-2 border-blue-400 bg-gray-900/50"
+                      : "text-gray-400 hover:text-white"
+                  }`}
+                >
+                  <Code className="h-4 w-4" />
+                  Code
+                  <StatusIndicator status={generationState.codeStatus} progress={generationState.codeProgress} />
+                </button>
+              </div>
+            </div>
+
+            <div className="flex-1 overflow-hidden">
+              {activeTab === "video" ? (
+                <div className="h-full flex flex-col">
+                  {generationState.videoStatus === "generating" ? (
+                    <div className="flex-1 flex items-center justify-center">
+                      <div className="text-center">
+                        <Loader2 className="h-12 w-12 animate-spin text-blue-400 mx-auto mb-4" />
+                        <p className="text-gray-400 mb-2">Generating video...</p>
+                        <div className="w-64 bg-gray-800 rounded-full h-2">
+                          <div
+                            className="bg-gradient-to-r from-blue-600 to-purple-600 h-2 rounded-full transition-all duration-300"
+                            style={{ width: `${generationState.videoProgress}%` }}
+                          />
+                        </div>
+                        <p className="text-sm text-gray-500 mt-2">{Math.round(generationState.videoProgress)}%</p>
+                      </div>
+                    </div>
+                  ) : generationState.videoStatus === "completed" && generatedVideoUrl ? (
+                    <div className="h-full flex flex-col">
+                      <div className="flex-1 p-4 flex items-center justify-center bg-gray-900">
+                        <div className="relative">
+                          <img
+                            src={generatedVideoUrl || "/placeholder.svg"}
+                            alt="Generated Math Animation"
+                            className="max-w-full max-h-full rounded-lg border border-gray-700"
+                          />
+                          <button className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-lg hover:bg-black/70 transition-colors">
+                            <div className="bg-white/20 backdrop-blur-sm rounded-full p-4">
+                              <Play className="h-12 w-12 text-white" />
+                            </div>
+                          </button>
+                        </div>
+                      </div>
+                      <div className="p-4 border-t border-gray-800">
+                        <button
+                          onClick={downloadVideo}
+                          className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-4 py-2 rounded-lg flex items-center justify-center gap-2"
+                        >
+                          <Download className="h-4 w-4" />
+                          Download Video
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex-1 flex items-center justify-center">
+                      <div className="text-center text-gray-500">
+                        <Video className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                        <p>Video will appear here once generated</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="h-full flex flex-col">
+                  {generationState.codeStatus === "generating" ? (
+                    <div className="flex-1 flex items-center justify-center">
+                      <div className="text-center">
+                        <Loader2 className="h-12 w-12 animate-spin text-blue-400 mx-auto mb-4" />
+                        <p className="text-gray-400 mb-2">Generating code...</p>
+                        <div className="w-64 bg-gray-800 rounded-full h-2">
+                          <div
+                            className="bg-gradient-to-r from-blue-600 to-purple-600 h-2 rounded-full transition-all duration-300"
+                            style={{ width: `${generationState.codeProgress}%` }}
+                          />
+                        </div>
+                        <p className="text-sm text-gray-500 mt-2">{Math.round(generationState.codeProgress)}%</p>
+                      </div>
+                    </div>
+                  ) : generationState.codeStatus === "completed" && generatedCode ? (
+                    <div className="h-full flex flex-col">
+                      <div className="flex-1 overflow-auto">
+                        <pre className="p-4 text-sm text-gray-300 bg-gray-900 h-full overflow-auto font-mono">
+                          <code>{generatedCode}</code>
+                        </pre>
+                      </div>
+                      <div className="p-4 border-t border-gray-800">
+                        <button
+                          onClick={copyCode}
+                          className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-4 py-2 rounded-lg flex items-center justify-center gap-2"
+                        >
+                          <Copy className="h-4 w-4" />
+                          Copy Code
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex-1 flex items-center justify-center">
+                      <div className="text-center text-gray-500">
+                        <Code className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                        <p>Code will appear here once generated</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Original landing page view
   return (
     <div className="min-h-screen bg-gray-950 text-white">
       {/* Navbar */}
@@ -70,23 +497,32 @@ export default function MathMotionLanding() {
                 Examples
               </button>
               <button className="text-gray-400 hover:text-white text-sm px-3 py-2 rounded-md hover:bg-gray-800/50">
-               About
+                Docs
               </button>
             </div>
-
-            <div className="flex items-center gap-2">
-              <button onClick={() => window.location.href = "/login"} className="text-gray-400 hover:text-white text-sm px-3 py-2 rounded-md hover:bg-gray-800/50 flex items-center">
-                <LogIn className="h-4 w-4 mr-2" />
-                Login
-              </button>
-              <button onClick={() => window.location.href = "/signup"} className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-sm px-3 py-2 rounded-md flex items-center">
-                <UserPlus className="h-4 w-4 mr-2" />
-                Sign Up
-              </button>
+               <div className="flex items-center gap-2">
+              <a href="/login">
+                <button className="text-gray-400 hover:text-white text-sm px-3 py-2 rounded-md hover:bg-gray-800/50 flex items-center">
+                  <LogIn className="h-4 w-4 mr-2" />
+                  Login
+                </button>
+              </a>
+              <a href="/signup">
+                <button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-sm px-3 py-2 rounded-md flex items-center">
+                  <UserPlus className="h-4 w-4 mr-2" />
+                  Sign Up
+                </button>
+              </a>
             </div>
+            <button className="text-gray-400 hover:text-white p-2 rounded-md hover:bg-gray-800/50">
+              <Menu className="h-5 w-5" />
+            </button>
           </div>
         </div>
       </nav>
+      
+          
+     
 
       <div className="flex h-[calc(100vh-73px)] relative">
         {/* Hover Trigger Area */}
@@ -130,7 +566,7 @@ export default function MathMotionLanding() {
                         {item.timestamp}
                       </div>
                     </div>
-                    <p className="text-sm text-gray-300 line-clamp-2">{item.prompt}</p>
+                    <p className="text-sm text-gray-300">{item.prompt}</p>
                   </div>
                 ))}
               </div>
@@ -173,9 +609,7 @@ export default function MathMotionLanding() {
                 </div>
 
                 <div className="flex items-center justify-between text-sm text-gray-500">
-                  <div className="flex items-center gap-4">
-                    <span>Press Ctrl+Enter to generate</span>
-                  </div>
+                  <span>Press Ctrl+Enter to generate</span>
                   <span>{prompt.length}/500</span>
                 </div>
               </form>
@@ -202,7 +636,6 @@ export default function MathMotionLanding() {
             </div>
           </div>
 
-          {/* Footer */}
           <div className="border-t border-gray-800 p-4">
             <div className="flex items-center justify-center gap-4 text-sm text-gray-500">
               <span>Powered by Manim</span>
