@@ -37,7 +37,7 @@ export default function MainPanel({
         <div className=' flex items-center'>
           <ViewTabs currentView={view} onViewChange={onViewChange} />
         </div>
-        <GenerateButton onGenerate={onGenerate} disabled= {status !== 'Kernel Ready'} />
+        <GenerateButton onGenerate={onGenerate} disabled= {isGenerating || status !== 'Kernel Ready'} />
       </div>
 
       <div className="flex-1 rounded-xl overflow-hidden">

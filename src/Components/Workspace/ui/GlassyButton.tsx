@@ -9,13 +9,12 @@ interface GlassyButtonProps {
 
 function GlassyButton({ children, onClick, disabled }: GlassyButtonProps) {
     const [isHovered, setIsHovered] = useState(false);
-
     return (
         <motion.button
             onClick={onClick}
             onHoverStart={() => setIsHovered(true)}
             onHoverEnd={() => setIsHovered(false)}
-            className="relative flex items-center justify-center bg-[#1e1e1e] rounded-full"
+            className={`relative flex items-center justify-center bg-[#1e1e1e] rounded-full ${disabled && "cursor-not-allowed"} `}
         >
             <AnimatePresence>
                 {isHovered && (
