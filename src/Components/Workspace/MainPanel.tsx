@@ -1,12 +1,12 @@
-import React from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import type { ViewType } from './types';
 import ViewTabs from './ViewTabs';
-import KernelStatus from './KernelStatus';
 import CodeEditor from './CodeEditor';
 import VideoPreview from './VideoPreview';
-import Terminal from './Terminal';
+import BlockingOverlay from './BlockingOverlay';
+import GenerateButton from './GenerateButton';
 
-interface CodePanelProps {
+interface MainPanelProps {
   view: ViewType;
   onViewChange: (view: ViewType) => void;
   status: string;
@@ -15,7 +15,8 @@ interface CodePanelProps {
   userCode: string;
   onCodeChange: (code: string) => void;
   videoData: string | null;
-  terminalOutput: string;
+  codeError: string | null;
+  isGenerating: boolean;
 }
 
 export default function MainPanel({
@@ -27,28 +28,50 @@ export default function MainPanel({
   userCode,
   onCodeChange,
   videoData,
-  terminalOutput
-}: CodePanelProps) {
+  codeError,
+  isGenerating,
+}: MainPanelProps) {
   return (
-    <div className="w-2/3 border border-black p-2 flex flex-col">
-      <div className="flex justify-between items-center mb-2">
-        <ViewTabs currentView={view} onViewChange={onViewChange} />
-        <KernelStatus
-          status={status}
-          onReconnect={onReconnect}
-          onGenerate={onGenerate}
-        />
+    <div className="w-2/3 m-2 p-2 bg-zinc-800 rounded-2xl flex flex-col gap-2">
+      <div className="flex justify-between items-center">
+        <div className=' flex items-center'>
+          <ViewTabs currentView={view} onViewChange={onViewChange} />
+        </div>
+        <GenerateButton onGenerate={onGenerate} disabled= {status !== 'Kernel Ready'} />
       </div>
 
-      <div className="flex-1 border overflow-hidden flex flex-col">
-        {view === 'editor' ? (
-          <CodeEditor code={userCode} onChange={onCodeChange} />
-        ) : (
-          <VideoPreview videoData={videoData} />
-        )}
+      <div className="flex-1 rounded-xl overflow-hidden">
+        <AnimatePresence mode="wait">
+          {view === 'editor' ? (
+            <motion.div
+              key="editor"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+              className="relative h-full w-full"
+            >
+              <CodeEditor code={userCode} onChange={onCodeChange} />
+              <BlockingOverlay
+                isVisible={["Connecting", "Getting Response", "Setting Up Environment", "Kernel disconnected", "WebSocket error"].includes(status)}
+                status={status}
+                onReconnect={onReconnect}
+              />
+            </motion.div>
+          ) : (
+            <motion.div
+              key="preview"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+              className="relative h-full w-full"
+            >
+              <VideoPreview videoData={videoData} codeError={codeError} />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
-
-      <Terminal output={terminalOutput} />
     </div>
   );
 }

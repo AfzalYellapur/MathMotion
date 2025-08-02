@@ -16,4 +16,4 @@ export interface KernelMessage {
   content: any;
 }
 
-export type ViewType = 'editor' | 'video';
+export type ViewType = 'editor' | 'preview';

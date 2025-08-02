@@ -1,4 +1,4 @@
-import React from 'react';
+import Editor from "@monaco-editor/react";
 
 interface CodeEditorProps {
   code: string;
@@ -7,11 +7,25 @@ interface CodeEditorProps {
 
 export default function CodeEditor({ code, onChange }: CodeEditorProps) {
   return (
-    <textarea
+    <div className="h-full pt-2 pb-2 bg-[#1e1e1e] border-4 border-zinc-900 rounded-xl overflow-hidden">
+    <Editor
+      height="100%"
+      defaultLanguage="python"
+      theme="vs-dark"
+      defaultValue={``}
       value={code}
-      onChange={(e) => onChange(e.target.value)}
-      className="flex-1 resize-none w-full p-2 outline-none"
-      placeholder="Enter your Manim code here..."
+      onChange={(value) => onChange(value || "")}
+      options={{
+        fontSize: 14,
+        fontFamily: 'Jetbrains-Mono',
+        fontLigatures: true,
+        minimap: { enabled: false },
+        wordWrap: "on",
+        scrollBeyondLastLine: false,
+        automaticLayout: true,
+      }}
     />
+    </div>
+
   );
 }

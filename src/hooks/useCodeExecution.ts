@@ -32,7 +32,7 @@ function useCodeExecution({ ws }: UseCodeExecutionProps) {
     const className = extractManimClass(userCode);
 
     if (!className) {
-      alert("Your code must define a class extending Scene, like: class MyScene(Scene):");
+      alert("Your code must define a class to render, like: MyScene().render()");
       return false;
     }
 

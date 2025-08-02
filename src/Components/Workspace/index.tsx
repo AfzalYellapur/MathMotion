@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from 'react-router-dom';
 import useBinderKernel from "../../hooks/useBinderKernel";
-import useTerminal from "../../hooks/useTerminal";
 import useWebSocketHandler from "../../hooks/useWebSocketHandler";
 import useCodeExecution from "../../hooks/useCodeExecution";
 import ChatPanel from "./ChatPanel";
@@ -12,29 +11,27 @@ function Workspace() {
     const [view, setView] = useState<ViewType>('editor');
     const location = useLocation();
     const initialPrompt = location.state?.prompt || '';
-
     const [chatInput, setChatInput] = useState(initialPrompt);
     const [messages, setMessages] = useState<Message[]>([]);
     const [userCode, setUserCode] = useState('');
     const [videoData, setVideoData] = useState<string | null>(null);
-
+    const [codeError, setCodeError] = useState<string | null>(null);
     const { ws, status, connect } = useBinderKernel();
-    const { terminalOutput, addOutput } = useTerminal();
     const { executeCode } = useCodeExecution({ ws });
+    const [isGenerating, setIsGenerating] = useState(false);
 
     // Handle WebSocket messages
     useWebSocketHandler({
         ws,
-        onVideoData: setVideoData,
-        onTerminalOutput: addOutput
-    });
-
-    // Handle kernel disconnection
-    useEffect(() => {
-        if (status === "Kernel disconnected") {
-            addOutput("\n\nKernel has shut down due to inactivity.\n\n");
+        onVideoData: (data) => {
+            setVideoData(data);
+            setIsGenerating(false); // This will run every time
+        },
+        onCodeError: (error) => {
+            setCodeError(error);
+            setIsGenerating(false); // This will run every time
         }
-    }, [status]);
+    });
 
     // Handle initial prompt
     useEffect(() => {
@@ -55,7 +52,7 @@ function Workspace() {
     };
 
     return (
-        <div className="flex h-screen">
+        <div className="flex h-screen bg-black">
             <ChatPanel
                 messages={messages}
                 chatInput={chatInput}
@@ -68,11 +65,19 @@ function Workspace() {
                 onViewChange={setView}
                 status={status}
                 onReconnect={connect}
-                onGenerate={() => { executeCode(userCode) }}
+                isGenerating={isGenerating}
+                onGenerate={() => {
+                    if (status === 'Kernel Ready') {
+                        setIsGenerating(true);
+                        setVideoData(null);
+                        setCodeError(null);
+                        executeCode(userCode);
+                    }
+                }}
                 userCode={userCode}
                 onCodeChange={setUserCode}
                 videoData={videoData}
-                terminalOutput={terminalOutput}
+                codeError={codeError}
             />
         </div>
     );
