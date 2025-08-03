@@ -2,7 +2,7 @@ import GlassyButton from './ui/GlassyButton';
 
 interface GenerateButtonProps {
   onGenerate: () => void;
-  disabled?: boolean; // optional prop
+  disabled?: boolean; 
 }
 
 export default function GenerateButton({ onGenerate, disabled }: GenerateButtonProps) {

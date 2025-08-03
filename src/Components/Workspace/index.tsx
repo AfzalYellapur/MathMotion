@@ -72,6 +72,7 @@ function Workspace() {
                         setVideoData(null);
                         setCodeError(null);
                         executeCode(userCode);
+                        setView("preview");
                     }
                 }}
                 userCode={userCode}
