@@ -68,6 +68,10 @@ export default function MainPanel({
               className="relative h-full w-full"
             >
               <VideoPreview videoData={videoData} codeError={codeError} />
+              <BlockingOverlay
+                isVisible={isGenerating}
+                status="Generating"
+              />
             </motion.div>
           )}
         </AnimatePresence>
