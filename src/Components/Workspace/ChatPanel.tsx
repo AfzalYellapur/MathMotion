@@ -9,7 +9,7 @@ interface ChatPanelProps {
 
 export default function ChatPanel({ messages, chatInput, onChatInputChange, onSendMessage }: ChatPanelProps) {
   return (
-    <div className="w-1/3 border border-white text-white p-2 flex flex-col">
+    <div className="w-[30%] border border-white text-white p-2 flex flex-col">
       <div className="flex-1 overflow-y-hidden">
         <div className="flex-1  overflow-y-auto mb-2 border p-2">
           {messages.map((msg, idx) => (

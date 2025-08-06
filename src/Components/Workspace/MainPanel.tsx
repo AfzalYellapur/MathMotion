@@ -32,7 +32,7 @@ export default function MainPanel({
   isGenerating,
 }: MainPanelProps) {
   return (
-    <div className="w-2/3 m-2 p-2 bg-zinc-800 rounded-2xl flex flex-col gap-2">
+    <div className="w-[70%] m-2 p-2 bg-zinc-800 rounded-2xl flex flex-col gap-2">
       <div className="flex justify-between items-center">
         <div className=' flex items-center'>
           <ViewTabs currentView={view} onViewChange={onViewChange} />

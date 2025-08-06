@@ -20,7 +20,7 @@ export default function CodeEditor({ code, onChange }: CodeEditorProps) {
         fontFamily: 'Jetbrains-Mono',
         fontLigatures: true,
         minimap: { enabled: false },
-        wordWrap: "on",
+        wordWrap: "off",
         scrollBeyondLastLine: false,
         automaticLayout: true,
       }}
