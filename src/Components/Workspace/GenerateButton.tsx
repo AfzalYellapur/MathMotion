@@ -1,4 +1,4 @@
-import GlassyButton from './ui/GlassyButton';
+import GlassyButton from '../ui/GlassyButton';
 
 interface GenerateButtonProps {
   onGenerate: () => void;

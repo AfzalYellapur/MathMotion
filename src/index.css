@@ -2,6 +2,28 @@
 
 @plugin 'tailwind-scrollbar';
 
+.glassy-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.glassy-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+  margin-block: 8px; /* prevents it from sticking to top/bottom edges */
+  border-radius: 8px;
+}
+
+.glassy-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(4px);
+}
+
+.glassy-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {

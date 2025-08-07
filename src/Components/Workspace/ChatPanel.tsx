@@ -1,5 +1,5 @@
 import type { Message } from './types/index';
-
+import GlassyChatbox from '../ui/GlassyChatBox';
 interface ChatPanelProps {
   messages: Message[];
   chatInput: string;
@@ -9,9 +9,9 @@ interface ChatPanelProps {
 
 export default function ChatPanel({ messages, chatInput, onChatInputChange, onSendMessage }: ChatPanelProps) {
   return (
-    <div className="w-[30%] border border-white text-white p-2 flex flex-col">
+    <div className="w-[30%] p-2 flex flex-col">
       <div className="flex-1 overflow-y-hidden">
-        <div className="flex-1  overflow-y-auto mb-2 border p-2">
+        <div className="flex-1  text-white overflow-y-auto mb-2 border p-2">
           {messages.map((msg, idx) => (
             <p key={idx} className="mb-1">
               <strong>{msg.sender === 'user' ? 'You' : 'AI'}:</strong>
@@ -20,7 +20,7 @@ export default function ChatPanel({ messages, chatInput, onChatInputChange, onSe
           ))}
         </div>
       </div>
-      <div className="flex gap-2">
+      {/* <div className="flex gap-2">
         <textarea
           value={chatInput}
           onChange={(e) => onChatInputChange(e.target.value)}
@@ -32,8 +32,9 @@ export default function ChatPanel({ messages, chatInput, onChatInputChange, onSe
           className="h-24 px-4 bg-blue-500 text-white rounded"
         >
           Send
-        </button>
-      </div>
+        </button> */}
+      {/* </div> */}
+        <GlassyChatbox />
     </div>
   );
 }
