@@ -2,28 +2,16 @@
 
 import type React from "react"
 import { useState, useRef, useEffect } from "react"
-import {
-  Send,
-  History,
-  Clock,
-  Sparkles,
-  Play,
-  Download,
-  Copy,
-  Code,
-  Video,
-  Loader2,
-  CheckCircle,
-  XCircle,
-  Menu,
-  ArrowLeft,LogIn,UserPlus
-} from "lucide-react"
-
+import { Send, History, Clock, Sparkles, Play, Download, Copy, Code, Video, Loader2, CheckCircle, XCircle, Menu, ArrowLeft } from 'lucide-react'
+import LEDMatrixBackground from "./LEDMatrixBackground"
+import SignupPage from "./Signup"
+import LoginPage from "./Login"
 interface ChatMessage {
   id: string
   type: "user" | "assistant"
   content: string
   timestamp: string
+  status?: "pending" | "completed" | "failed"
 }
 
 interface ChatHistoryItem {
@@ -106,49 +94,76 @@ export default function MathMotionLanding() {
     }
     setChatMessages((prev) => [...prev, userMessage])
 
-    // Add assistant thinking message
-    const thinkingMessage: ChatMessage = {
-      id: (Date.now() + 1).toString(),
-      type: "assistant",
-      content: "I'll create a math animation for you. Let me generate the code and render the video...",
-      timestamp: new Date().toLocaleTimeString(),
-    }
-    setChatMessages((prev) => [...prev, thinkingMessage])
+    // Add initial thinking messages with pending status
+    const initialThinkingMessages: ChatMessage[] = [
+      {
+        id: "thinking-understanding",
+        type: "assistant",
+        content: "Understanding Prompt",
+        timestamp: new Date().toLocaleTimeString(),
+        status: "pending",
+      },
+      {
+        id: "thinking-generating-code",
+        type: "assistant",
+        content: "Generating Code",
+        timestamp: new Date().toLocaleTimeString(),
+        status: "pending",
+      },
+      {
+        id: "thinking-executing-code",
+        type: "assistant",
+        content: "Executing Code",
+        timestamp: new Date().toLocaleTimeString(),
+        status: "pending",
+      },
+      {
+        id: "thinking-generating-video",
+        type: "assistant",
+        content: "Generating Video",
+        timestamp: new Date().toLocaleTimeString(),
+        status: "pending",
+      },
+    ]
+    setChatMessages((prev) => [...prev, ...initialThinkingMessages])
 
-    // Simulate code generation progress
+    // Simulate code and video generation progress in parallel
     const codeInterval = setInterval(() => {
       setGenerationState((prev) => {
         const newProgress = Math.min(prev.codeProgress + Math.random() * 15, 100)
         if (newProgress >= 100) {
           clearInterval(codeInterval)
-          return {
-            ...prev,
-            codeProgress: 100,
-            codeStatus: "completed",
-          }
+          return { ...prev, codeProgress: 100, codeStatus: "completed" }
         }
         return { ...prev, codeProgress: newProgress }
       })
     }, 200)
 
-    // Simulate video generation progress
     const videoInterval = setInterval(() => {
       setGenerationState((prev) => {
         const newProgress = Math.min(prev.videoProgress + Math.random() * 10, 100)
         if (newProgress >= 100) {
           clearInterval(videoInterval)
-          return {
-            ...prev,
-            videoProgress: 100,
-            videoStatus: "completed",
-          }
+          return { ...prev, videoProgress: 100, videoStatus: "completed" }
         }
         return { ...prev, videoProgress: newProgress }
       })
     }, 300)
 
-    // Generate dummy code after 2 seconds
+    const stepDuration = 1500 // 1.5 seconds
+
+    // Step 1: Understanding Prompt
     setTimeout(() => {
+      setChatMessages((prev) =>
+        prev.map((msg) => (msg.id === "thinking-understanding" ? { ...msg, status: "completed" } : msg)),
+      )
+    }, stepDuration)
+
+    // Step 2: Generating Code
+    setTimeout(() => {
+      setChatMessages((prev) =>
+        prev.map((msg) => (msg.id === "thinking-generating-code" ? { ...msg, status: "completed" } : msg)),
+      )
       const dummyCode = `from manim import *
 
 class DerivativeAnimation(Scene):
@@ -177,31 +192,42 @@ class DerivativeAnimation(Scene):
         self.play(Write(derivative_text))
         
         self.wait(2)`
-
       setGeneratedCode(dummyCode)
-    }, 2000)
+    }, stepDuration * 2)
 
-    // Generate dummy video URL after 4 seconds
+    // Step 3: Executing Code
     setTimeout(() => {
+      setChatMessages((prev) =>
+        prev.map((msg) => (msg.id === "thinking-executing-code" ? { ...msg, status: "completed" } : msg)),
+      )
+    }, stepDuration * 3)
+
+    // Step 4: Generating Video
+    setTimeout(() => {
+      setChatMessages((prev) =>
+        prev.map((msg) => (msg.id === "thinking-generating-video" ? { ...msg, status: "completed" } : msg)),
+      )
       setGeneratedVideoUrl("/placeholder.svg?height=400&width=600&text=Math+Animation")
-    }, 4000)
+    }, stepDuration * 4)
 
-    // Complete generation after 5 seconds
-    setTimeout(() => {
-      setGenerationState((prev) => ({
-        ...prev,
-        isGenerating: false,
-      }))
+    // Final completion message after all steps are done
+    setTimeout(
+      () => {
+        setGenerationState((prev) => ({
+          ...prev,
+          isGenerating: false,
+        }))
 
-      // Add completion message
-      const completionMessage: ChatMessage = {
-        id: (Date.now() + 2).toString(),
-        type: "assistant",
-        content: "✅ Animation generated successfully! You can view the video and code in the panels on the right.",
-        timestamp: new Date().toLocaleTimeString(),
-      }
-      setChatMessages((prev) => [...prev, completionMessage])
-    }, 5000)
+        const completionMessage: ChatMessage = {
+          id: (Date.now() + 5).toString(),
+          type: "assistant",
+          content: "✅ Animation generated successfully! You can view the video and code in the panels on the right.",
+          timestamp: new Date().toLocaleTimeString(),
+        }
+        setChatMessages((prev) => [...prev, completionMessage])
+      },
+      stepDuration * 4 + 500,
+    )
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -209,7 +235,6 @@ class DerivativeAnimation(Scene):
     if (!prompt.trim()) return
 
     const userPrompt = prompt.trim()
-    // Do NOT clear the prompt here, so it persists when returning to main view
     setShowSplitView(true)
 
     await simulateGeneration(userPrompt)
@@ -254,52 +279,30 @@ class DerivativeAnimation(Scene):
   if (showSplitView) {
     return (
       <div className="min-h-screen bg-gray-950 text-white">
-        {/* Navbar */}
-        <nav className="border-b border-gray-800 bg-gray-950/80 backdrop-blur-sm sticky top-0 z-50">
-          <div className="flex items-center justify-between px-4 py-3">
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setShowSplitView(false)}
-                className="text-gray-400 hover:text-white p-2 rounded-md hover:bg-gray-800/50 flex items-center gap-2"
-              >
-                <ArrowLeft className="h-5 w-5" />
-                <span className="sr-only">Back to Home</span>
-              </button>
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                <Sparkles className="h-4 w-4 text-white" />
-              </div>
-              <h1 className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                MathMotion
-              </h1>
-              <span className="text-xs bg-blue-600/20 text-blue-400 px-2 py-1 rounded-full border border-blue-600/30">
-                Demo
-              </span>
-            </div>
-
-            <div className="flex items-center gap-4">
-              <div className="hidden sm:flex items-center gap-2">
-                <button className="text-gray-400 hover:text-white text-sm px-3 py-2 rounded-md hover:bg-gray-800/50">
-                  Examples
-                </button>
-                <button className="text-gray-400 hover:text-white text-sm px-3 py-2 rounded-md hover:bg-gray-800/50">
-                  Docs
-                </button>
-              </div>
-              <button className="text-gray-400 hover:text-white p-2 rounded-md hover:bg-gray-800/50">
-                <Menu className="h-5 w-5" />
-              </button>
-            </div>
-          </div>
-        </nav>
-
-        <div className="flex h-[calc(100vh-73px)]">
+        <div className="flex h-screen">
           {/* Chat Panel */}
           <div className="w-1/2 border-r border-gray-800 flex flex-col">
             {/* Chat Header */}
-            <div className="p-4 border-b border-gray-800">
-              <div className="flex items-center gap-2 text-white">
-                <History className="h-5 w-5" />
-                <h2 className="font-semibold">Chat</h2>
+            <div className="p-4 border-b border-gray-800 bg-gray-950">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-white">
+                  <button
+                    onClick={() => setShowSplitView(false)}
+                    className="text-gray-400 hover:text-white p-1 rounded-md hover:bg-gray-800/50 flex items-center gap-2"
+                  >
+                    <ArrowLeft className="h-4 w-4" />
+                  </button>
+                  <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-purple-600 rounded-md flex items-center justify-center">
+                    <Sparkles className="h-3 w-3 text-white" />
+                  </div>
+                  <h1 className="text-lg font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                    MathMotion
+                  </h1>
+                </div>
+                <div className="flex items-center gap-2 text-white">
+                  <History className="h-4 w-4" />
+                  <h2 className="font-semibold text-sm">Chat</h2>
+                </div>
               </div>
             </div>
 
@@ -311,10 +314,20 @@ class DerivativeAnimation(Scene):
                     className={`max-w-[80%] rounded-lg p-3 ${
                       message.type === "user"
                         ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white"
-                        : "bg-gray-800 text-gray-100"
+                        : message.status
+                          ? "bg-gray-900 text-gray-400 text-xs py-2 px-3"
+                          : "bg-gray-800 text-gray-100"
                     }`}
                   >
-                    <p className="text-sm">{message.content}</p>
+                    <p className="flex items-center gap-2">
+                      {message.type === "assistant" && message.status === "pending" && (
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                      )}
+                      {message.type === "assistant" && message.status === "completed" && (
+                        <CheckCircle className="h-3 w-3 text-green-400" />
+                      )}
+                      {message.content}
+                    </p>
                     <p className="text-xs opacity-70 mt-1">{message.timestamp}</p>
                   </div>
                 </div>
@@ -476,71 +489,44 @@ class DerivativeAnimation(Scene):
     )
   }
 
-  // Original landing page view
+  // Original landing page view with LED Matrix background
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
-      {/* Navbar */}
-      <nav className="border-b border-gray-800 bg-gray-950/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="flex items-center justify-between px-4 py-3">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-              <Sparkles className="h-4 w-4 text-white" />
-            </div>
-            <h1 className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-              MathMotion
-            </h1>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <div className="hidden sm:flex items-center gap-2">
-              <button className="text-gray-400 hover:text-white text-sm px-3 py-2 rounded-md hover:bg-gray-800/50">
-                Examples
-              </button>
-              <button className="text-gray-400 hover:text-white text-sm px-3 py-2 rounded-md hover:bg-gray-800/50">
-                Docs
-              </button>
-            </div>
-               <div className="flex items-center gap-2">
-              <a href="/login">
-                <button className="text-gray-400 hover:text-white text-sm px-3 py-2 rounded-md hover:bg-gray-800/50 flex items-center">
-                  <LogIn className="h-4 w-4 mr-2" />
-                  Login
-                </button>
-              </a>
-              <a href="/signup">
-                <button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-sm px-3 py-2 rounded-md flex items-center">
-                  <UserPlus className="h-4 w-4 mr-2" />
-                  Sign Up
-                </button>
-              </a>
-            </div>
-            <button className="text-gray-400 hover:text-white p-2 rounded-md hover:bg-gray-800/50">
-              <Menu className="h-5 w-5" />
-            </button>
-          </div>
-        </div>
-      </nav>
+    <div className="min-h-screen bg-gray-950 text-white relative overflow-hidden">
+      {/* LED Matrix Background */}
+      <LEDMatrixBackground />
       
-          
-     
-
-      <div className="flex h-[calc(100vh-73px)] relative">
+      <div className="flex h-screen relative">
         {/* Hover Trigger Area */}
         <div className="absolute left-0 top-0 w-12 h-full z-40" onMouseEnter={() => setHoverSidebar(true)} />
 
         {/* Sidebar */}
         <div
-          className={`fixed left-0 top-[73px] h-[calc(100vh-73px)] w-80 bg-gray-950 border-r border-gray-800 transform transition-transform duration-300 ease-in-out z-30 ${
+          className={`fixed left-0 top-0 h-screen w-80 bg-gray-950/95 backdrop-blur-md border-r border-gray-700/50 transform transition-transform duration-300 ease-in-out z-30 ${
             hoverSidebar ? "translate-x-0" : "-translate-x-full"
           }`}
           onMouseEnter={() => setHoverSidebar(true)}
           onMouseLeave={() => setHoverSidebar(false)}
         >
           <div className="flex flex-col h-full">
-            <div className="p-4 border-b border-gray-800">
+            <div className="p-4 border-b border-gray-800/50">
               <div className="flex items-center gap-2 text-white">
                 <History className="h-5 w-5" />
                 <h2 className="font-semibold">Chat History</h2>
+              </div>
+            </div>
+
+            <div className="p-4 border-b border-gray-800/50">
+              <div className="space-y-4">
+             <a href="/Signup">
+                <button className="w-full mb-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                  Sign Up
+                </button>
+          </a>
+          <a href="/login">
+                <button onClick={LoginPage} className="w-full bg-gray-800/80 hover:bg-gray-700/80 text-gray-200 px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-gray-600/50">
+                  Login
+                </button>
+                </a>
               </div>
             </div>
 
@@ -549,7 +535,7 @@ class DerivativeAnimation(Scene):
                 {chatHistory.map((item) => (
                   <div
                     key={item.id}
-                    className="p-3 rounded-lg bg-gray-900 hover:bg-gray-800 cursor-pointer transition-colors border border-gray-800"
+                    className="p-3 rounded-lg bg-gray-900/80 hover:bg-gray-800/80 cursor-pointer transition-colors border border-gray-700/50"
                   >
                     <div className="flex items-start justify-between gap-2 mb-2">
                       <div
@@ -566,7 +552,7 @@ class DerivativeAnimation(Scene):
                         {item.timestamp}
                       </div>
                     </div>
-                    <p className="text-sm text-gray-300">{item.prompt}</p>
+                    <p className="text-sm text-gray-200">{item.prompt}</p>
                   </div>
                 ))}
               </div>
@@ -575,15 +561,18 @@ class DerivativeAnimation(Scene):
         </div>
 
         {/* Main Content */}
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col relative z-10">
           <div className="flex-1 flex items-center justify-center p-8">
-            <div className="w-full max-w-2xl space-y-8">
+            <div className="w-full max-w-2xl space-y-6">
               {/* Hero Section */}
               <div className="text-center space-y-4">
-                <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                <h1 className="text-6xl md:text-7xl font-bold bg-gradient-to-r from-white via-blue-200 to-blue-300 bg-clip-text text-transparent mb-4">
+                  MathMotion
+                </h1>
+                <h2 className="text-2xl md:text-3xl font-semibold text-gray-300 mb-6">
                   Create Beautiful Math Animations
                 </h2>
-                <p className="text-xl text-gray-400 max-w-lg mx-auto">
+                <p className="text-lg text-gray-400 max-w-lg mx-auto">
                   Transform mathematical concepts into stunning visual animations using the power of Manim
                 </p>
               </div>
@@ -595,7 +584,7 @@ class DerivativeAnimation(Scene):
                     value={prompt}
                     onChange={(e) => setPrompt(e.target.value)}
                     placeholder="Describe the math animation you want to create... (e.g., 'Show how the sine function relates to the unit circle')"
-                    className="w-full min-h-[120px] bg-gray-900 border border-gray-700 rounded-md text-white placeholder-gray-500 resize-none p-3 pr-12 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    className="w-full min-h-[120px] bg-gray-900/90 backdrop-blur-sm border border-gray-600/50 rounded-md text-white placeholder-gray-400 resize-none p-3 pr-12 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400"
                   />
                   <div className="absolute bottom-3 right-3">
                     <button
@@ -608,7 +597,7 @@ class DerivativeAnimation(Scene):
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between text-sm text-gray-500">
+                <div className="flex items-center justify-between text-sm text-gray-400">
                   <span>Press Ctrl+Enter to generate</span>
                   <span>{prompt.length}/500</span>
                 </div>
@@ -626,21 +615,13 @@ class DerivativeAnimation(Scene):
                     <button
                       key={index}
                       onClick={() => setPrompt(example)}
-                      className="text-left p-3 rounded-lg bg-gray-900/50 hover:bg-gray-900 border border-gray-800 hover:border-gray-700 transition-colors text-sm text-gray-300"
+                      className="text-left p-3 rounded-lg bg-gray-900/90 backdrop-blur-sm hover:bg-gray-800/90 border border-gray-600/50 hover:border-gray-500/50 transition-colors text-sm text-gray-200"
                     >
                       {example}
                     </button>
                   ))}
                 </div>
               </div>
-            </div>
-          </div>
-
-          <div className="border-t border-gray-800 p-4">
-            <div className="flex items-center justify-center gap-4 text-sm text-gray-500">
-              <span>Powered by Manim</span>
-              <span>•</span>
-              <span>Built for educators and students</span>
             </div>
           </div>
         </div>
