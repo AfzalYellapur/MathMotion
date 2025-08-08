@@ -1,5 +1,6 @@
 import type { Message } from './types/index';
 import GlassyChatbox from '../ui/GlassyChatBox';
+import GlassyChatInterface from '../ui/GlassyChatInterface';
 interface ChatPanelProps {
   messages: Message[];
   chatInput: string;
@@ -7,10 +8,10 @@ interface ChatPanelProps {
   onSendMessage: () => void;
 }
 
-export default function ChatPanel({ messages, chatInput, onChatInputChange, onSendMessage }: ChatPanelProps) {
+export default function ChatPanel() {
   return (
     <div className="w-[30%] p-2 flex flex-col">
-      <div className="flex-1 overflow-y-hidden">
+      {/* <div className="flex-1 overflow-y-hidden">
         <div className="flex-1  text-white overflow-y-auto mb-2 border p-2">
           {messages.map((msg, idx) => (
             <p key={idx} className="mb-1">
@@ -19,7 +20,8 @@ export default function ChatPanel({ messages, chatInput, onChatInputChange, onSe
             </p>
           ))}
         </div>
-      </div>
+      </div> */}
+<GlassyChatInterface />
       {/* <div className="flex gap-2">
         <textarea
           value={chatInput}

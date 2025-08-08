@@ -8,7 +8,7 @@
 
 .glassy-scrollbar::-webkit-scrollbar-track {
   background: transparent;
-  margin-block: 8px; /* prevents it from sticking to top/bottom edges */
+  margin-block: 10px; /* prevents it from sticking to top/bottom edges */
   border-radius: 8px;
 }
 
