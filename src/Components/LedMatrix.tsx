@@ -113,7 +113,7 @@ const LEDMatrix: React.FC<LEDMatrixProps> = ({
   });
 
   return (
-    <div className={`fixed -z-5 inset-0 overflow-hidden ${className}`}>
+    <div className={`fixed -z-10 inset-0 overflow-hidden ${className}`}>
       <div style={gridStyle}>
         {gridData.map((isAccent, index) => (
           <div
