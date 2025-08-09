@@ -13,7 +13,7 @@ function Landing() {
                 What do you want to Manimate?
             </p>
             <p className=" font-pixelify font-semibold text-xl text-neutral-300/90 mb-5">Turn complex concepts into easy-to-grasp visuals</p>
-            <GlassyChatbox />
+            <GlassyChatbox/>
         </div>
     );
 }
