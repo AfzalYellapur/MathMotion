@@ -54,10 +54,10 @@ function Workspace() {
     return (
         <div className="flex h-screen bg-black">
             <ChatPanel
-                messages={messages}
-                chatInput={chatInput}
-                onChatInputChange={setChatInput}
-                onSendMessage={handleSendMessage}
+                // messages={messages}
+                // // chatInput={chatInput}
+                // onChatInputChange={setChatInput}
+                // onSendMessage={handleSendMessage}
             />
 
             <MainPanel
