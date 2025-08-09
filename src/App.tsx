@@ -1,6 +1,6 @@
 import { Routes, Route } from 'react-router-dom'
-import Landing from './Components/MathMotionLanding'
-import Workspace from './Components/Workspace'
+import Landing from './Components/Landing/index'
+import Workspace from './Components/Workspace/index'
 import LoginPage from './Components/Login'
 import SignupPage from './Components/Signup'
 

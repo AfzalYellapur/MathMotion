@@ -3,7 +3,7 @@
 import type React from "react"
 import { useState, useRef, useEffect } from "react"
 import { Send, History, Clock, Sparkles, Play, Download, Copy, Code, Video, Loader2, CheckCircle, XCircle, Menu, ArrowLeft } from 'lucide-react'
-import LEDMatrixBackground from "./LEDMatrixBackground"
+import LedMatrix from "./LedMatrix"
 import SignupPage from "./Signup"
 import LoginPage from "./Login"
 interface ChatMessage {
@@ -493,7 +493,7 @@ class DerivativeAnimation(Scene):
   return (
     <div className="min-h-screen bg-gray-950 text-white relative overflow-hidden">
       {/* LED Matrix Background */}
-      <LEDMatrixBackground />
+      <LedMatrix />
       
       <div className="flex h-screen relative">
         {/* Hover Trigger Area */}
