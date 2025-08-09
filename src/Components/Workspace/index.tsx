@@ -3,8 +3,8 @@ import { useLocation } from 'react-router-dom';
 import useBinderKernel from "../../hooks/useBinderKernel";
 import useWebSocketHandler from "../../hooks/useWebSocketHandler";
 import useCodeExecution from "../../hooks/useCodeExecution";
-import ChatPanel from "./ChatPanel";
-import MainPanel from "./MainPanel";
+import ChatPanel from "./ChatPanel/ChatPanel";
+import MainPanel from "./MainPanel/MainPanel";
 import type { Message, ViewType } from "./types";
 
 function Workspace() {

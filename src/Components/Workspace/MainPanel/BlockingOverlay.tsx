@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import GlassyButton from '../ui/GlassyButton';
+import GlassyButton from '../../ui/GlassyButton';
 interface BlockingOverlayProps {
     isVisible: boolean;
     status: string;

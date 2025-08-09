@@ -8,7 +8,7 @@ import { Eye, EyeOff, Sparkles, Lock, User } from "lucide-react"
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [formData, setFormData] = useState({
-    username: "",
+    emailid: "",
     password: "",
   })
   const [isLoading, setIsLoading] = useState(false)
@@ -60,21 +60,21 @@ export default function LoginPage() {
         {/* Login Form */}
         <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-xl p-6">
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Username Input */}
+            {/* emailid Input */}
             <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-300 mb-2">
-                Username
+              <label htmlFor="emailid" className="block text-sm font-medium text-gray-300 mb-2">
+                Email ID
               </label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
                 <input
                   type="text"
-                  id="username"
-                  name="username"
-                  value={formData.username}
+                  id="emailid"
+                  name="emailid"
+                  value={formData.emailid}
                   onChange={handleInputChange}
                   className="w-full bg-gray-800 border border-gray-700 rounded-lg pl-10 pr-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
-                  placeholder="Enter your username"
+                  placeholder="Enter your Email ID"
                   required
                 />
               </div>

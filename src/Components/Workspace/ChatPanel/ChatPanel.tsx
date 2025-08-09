@@ -1,6 +1,6 @@
-import type { Message } from './types/index';
-import GlassyChatbox from '../ui/GlassyChatBox';
-import GlassyChatInterface from '../ui/GlassyChatInterface';
+import type { Message } from '../types/index';
+import GlassyChatbox from '../../ui/GlassyChatBox';
+import GlassyChatInterface from '../../ui/GlassyChatInterface';
 interface ChatPanelProps {
   messages: Message[];
   chatInput: string;

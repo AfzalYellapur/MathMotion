@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, useSpring, useTransform, MotionValue } from 'framer-motion';
-import type { ViewType } from './types';
+import type { ViewType } from '../types';
 
 interface ViewTabsProps {
   currentView: ViewType;

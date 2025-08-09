@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import type { ViewType } from './types';
+import type { ViewType } from '../types';
 import ViewTabs from './ViewTabs';
 import CodeEditor from './CodeEditor';
 import VideoPreview from './VideoPreview';

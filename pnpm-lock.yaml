@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@fontsource/pixelify-sans':
+        specifier: ^5.2.6
+        version: 5.2.6
       '@monaco-editor/react':
         specifier: ^4.7.0
         version: 4.7.0(monaco-editor@0.52.2)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -376,6 +379,9 @@ packages:
   '@eslint/plugin-kit@0.3.3':
     resolution: {integrity: sha512-1+WqvgNMhmlAambTvT3KPtCl/Ibr68VldY2XY40SL1CE0ZXiakFR/cbTspaF5HsnpDMvcYYoJHfl4980NBjGag==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+
+  '@fontsource/pixelify-sans@5.2.6':
+    resolution: {integrity: sha512-OvHb2k35TJPy75LRyBi1EUG8hkj9BBW64QpUS+b8IBnbTDN/XOg1BDVjXYEbWptLZfHsRnwu5FB7P97qHmJjNg==}
 
   '@humanfs/core@0.19.1':
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
@@ -1727,6 +1733,8 @@ snapshots:
     dependencies:
       '@eslint/core': 0.15.1
       levn: 0.4.1
+
+  '@fontsource/pixelify-sans@5.2.6': {}
 
   '@humanfs/core@0.19.1': {}
 

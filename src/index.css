@@ -1,6 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap');
 @import "tailwindcss";
-
 @plugin 'tailwind-scrollbar';
+
+@theme{
+  --font-pixelify : "Pixelify Sans", sans-serif;
+}
 
 .glassy-scrollbar::-webkit-scrollbar {
   width: 8px;

@@ -1,8 +1,8 @@
 import { Routes, Route } from 'react-router-dom'
 import Landing from './Components/Landing/index'
 import Workspace from './Components/Workspace/index'
-import LoginPage from './Components/Login'
-import SignupPage from './Components/Signup'
+import LoginPage from './Components/Auth/Login'
+import SignupPage from './Components/Auth/Signup'
 
 function App() {
   return (

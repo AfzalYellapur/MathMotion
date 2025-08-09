@@ -14,9 +14,9 @@ const LEDMatrix: React.FC<LEDMatrixProps> = ({
   gap = 4,
   accentColor = '#0080FF',
   secondaryColor = '#161819',
-  accentAmount = 0.7,
-  speed = 90,
-  size = 6,
+  accentAmount = 0.4,
+  speed = 50,
+  size = 15,
   className = ''
 }) => {
   const [gridData, setGridData] = useState<boolean[]>([]);
@@ -85,7 +85,7 @@ const LEDMatrix: React.FC<LEDMatrixProps> = ({
       });
       
       // Schedule next random change with variable timing
-      const nextDelay = 50 + speed;
+      const nextDelay = speed;
       setTimeout(animateRandomly, nextDelay);
     };
 
