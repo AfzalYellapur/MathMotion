@@ -36,7 +36,7 @@ export default function ChatPanel() {
           Send
         </button> */}
       {/* </div> */}
-        <GlassyChatbox />
+        <GlassyChatbox placeholder="Prompt here..."/>
     </div>
   );
 }

@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import GlassyButton from './GlassyButton';
 
-export default function GlassyChatbox() {
+interface GlassyChatBoxProps{
+    placeholder?: string;
+}
+
+export default function GlassyChatbox({placeholder}:GlassyChatBoxProps) {
     const [prompt, setPrompt] = useState('');
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -19,7 +23,7 @@ export default function GlassyChatbox() {
                     value={prompt}
                     onChange={(e) => setPrompt(e.target.value)}
                     onKeyDown={handleKeyDown}
-                    placeholder="Type your concept here and we will bring it to life..."
+                    placeholder={placeholder}
                     className="w-full h-32 p-4 pr-20 bg-zinc-900/10 backdrop-blur-md border border-white/10 bg-gradient-to-b from-white/10 to-transparent shadow-[inset_0_1px_1px_rgba(255,255,255,0.15),inset_0_-1px_1px_rgba(0,0,0,0.1)] text-white/80 rounded-2xl focus:outline-none focus:ring-2 focus:ring-white/20 transition-shadow duration-300 focus:shadow-[0_0_15px_rgba(255,255,255,0.1)] resize-none glassy-scrollbar "
                 />
                 {/* Send button */}
