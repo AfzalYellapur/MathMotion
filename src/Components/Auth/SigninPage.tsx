@@ -3,7 +3,7 @@ import type { ChangeEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import LEDMatrix from "../LedMatrix/index";
 import GlassyButton from "../ui/GlassyButton";
-
+import PageTransition from "../ui/PageTransition";
 function LoginPage() {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
@@ -30,7 +30,7 @@ function LoginPage() {
 
 
     return (
-        <>
+        <PageTransition>
             <div className="flex flex-col items-center justify-center h-screen w-screen absolute top-0 left-0">
                 <LEDMatrix />
                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.95)_0%,rgba(0,0,0,0.9)_5%,rgba(0,0,0,0.85)_15%,rgba(0,0,0,0.8)_20%,rgba(0,0,0,0.4)_60%,rgba(0,0,0,0)_75%)] -z-9" />
@@ -90,7 +90,7 @@ function LoginPage() {
                         <p className="text-sm text-neutral-300/90">
                            Don't have an account?{' '}
                             <button
-                                onClick={() => navigate('/login')}
+                                onClick={() => navigate('/signup')}
                                 className="text-cyan-400 hover:text-cyan-300 transition-colors duration-200 underline"
                             >
                                 Signup here
@@ -99,7 +99,7 @@ function LoginPage() {
                     </div>
                 </div>
             </div>
-        </>
+        </PageTransition>
     );
 }
 

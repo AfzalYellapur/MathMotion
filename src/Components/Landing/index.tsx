@@ -2,27 +2,29 @@ import { useNavigate } from "react-router-dom";
 import LEDMatrix from "../LedMatrix/index";
 import GlassyChatbox from "../ui/GlassyChatBox";
 import GlassyButton from "../ui/GlassyButton";
-
+import PageTransition from "../ui/PageTransition";
 function Landing() {
     const navigate = useNavigate();
 
     const handleLogin = () => {
-        navigate('/login');
+        navigate('/signin');
     };
 
     const handleSignup = () => {
         navigate('/signup');
     };
     return (
-        <>
+        <PageTransition>
             <div className="absolute top-4 right-4 z-1">
                 <div className="flex gap-x-2 p-1 bg-zinc-900/10 backdrop-blur-md border border-white/10 bg-gradient-to-b from-white/10 to-transparent shadow-[inset_0_1px_1px_rgba(255,255,255,0.15),inset_0_-1px_1px_rgba(0,0,0,0.1)] text-white/80 rounded-full ">
                     <GlassyButton
+                        background="bg-transparent"
                         onClick={handleLogin}
                     >
                         Login
                     </GlassyButton>
                     <GlassyButton
+                        background="bg-transparent"
                         onClick={handleSignup}
                     >
                         Signup
@@ -43,7 +45,7 @@ function Landing() {
                 </p>
                 <GlassyChatbox placeholder="Type your concept here and we will bring it to life..." />
             </div>
-        </>
+        </PageTransition>
     );
 }
 

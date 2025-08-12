@@ -5,10 +5,11 @@ interface GlassyButtonProps {
     children: React.ReactNode;
     onClick?: () => void;
     disabled?: boolean;
+    background?: string;
 }
 
 
-function GlassyButton({ children, onClick, disabled }: GlassyButtonProps) {
+function GlassyButton({ children, onClick, disabled, background }: GlassyButtonProps) {
     const [isHovered, setIsHovered] = useState(false);
     const isTextNode = typeof children === 'string';
 
@@ -27,7 +28,7 @@ function GlassyButton({ children, onClick, disabled }: GlassyButtonProps) {
             onClick={onClick}
             onHoverStart={() => setIsHovered(true)}
             onHoverEnd={() => setIsHovered(false)}
-            className={`relative flex items-center justify-center bg-[#1e1e1e] rounded-full ${disabled && "cursor-not-allowed"} `}
+            className={`relative flex items-center justify-center ${background} rounded-full ${disabled && "cursor-not-allowed"} `}
         >
             <AnimatePresence>
                 {isHovered && (

@@ -3,7 +3,7 @@ import type { ChangeEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import LEDMatrix from "../LedMatrix/index";
 import GlassyButton from "../ui/GlassyButton";
-
+import PageTransition from "../ui/PageTransition";
 function SignupPage() {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
@@ -34,26 +34,26 @@ function SignupPage() {
 
 
     return (
-        <>
-            <div 
-            className="flex flex-col items-center justify-center h-screen w-screen absolute top-0 left-0">
+        <PageTransition>
+            <div
+                className="flex flex-col items-center justify-center h-screen w-screen absolute top-0 left-0">
                 <LEDMatrix />
-                <div 
-                className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.95)_0%,rgba(0,0,0,0.9)_5%,rgba(0,0,0,0.85)_15%,rgba(0,0,0,0.8)_20%,rgba(0,0,0,0.4)_60%,rgba(0,0,0,0)_75%)] -z-9" />
+                <div
+                    className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.95)_0%,rgba(0,0,0,0.9)_5%,rgba(0,0,0,0.85)_15%,rgba(0,0,0,0.8)_20%,rgba(0,0,0,0.4)_60%,rgba(0,0,0,0)_75%)] -z-9" />
 
-                <div 
-                className="relative z-10 bg-zinc-900/10 backdrop-blur-md border border-white/10 bg-gradient-to-b from-white/10 to-transparent shadow-[inset_0_1px_1px_rgba(255,255,255,0.15),inset_0_-1px_1px_rgba(0,0,0,0.1)] text-white/80 rounded-2xl p-8 w-full max-w-md mx-4">
-                    <h1 
-                    className="font-bold text-3xl text-cyan-50 mb-2 text-center">
+                <div
+                    className="relative z-10 bg-zinc-900/10 backdrop-blur-md border border-white/10 bg-gradient-to-b from-white/10 to-transparent shadow-[inset_0_1px_1px_rgba(255,255,255,0.15),inset_0_-1px_1px_rgba(0,0,0,0.1)] text-white/80 rounded-2xl p-8 w-full max-w-md mx-4">
+                    <h1
+                        className="font-bold text-3xl text-cyan-50 mb-2 text-center">
                         Create Account
                     </h1>
-                    <p 
-                    className="font-pixelify text-sm text-neutral-300/90 mb-6 text-center">
+                    <p
+                        className="font-pixelify text-sm text-neutral-300/90 mb-6 text-center">
                         Join the Manimate community
                     </p>
 
                     <div className="space-y-4">
-    
+
                         <div>
                             <label className="block text-sm text-cyan-50 mb-2">
                                 Username
@@ -123,16 +123,16 @@ function SignupPage() {
                         <p className="text-sm text-neutral-300/90">
                             Already have an account?{' '}
                             <button
-                                onClick={() => navigate('/login')}
+                                onClick={() => navigate('/signin')}
                                 className="text-cyan-400 hover:text-cyan-300 transition-colors duration-200 underline"
                             >
-                                Login here
+                                Signin here
                             </button>
                         </p>
                     </div>
                 </div>
             </div>
-        </>
+        </PageTransition>
     );
 }
 

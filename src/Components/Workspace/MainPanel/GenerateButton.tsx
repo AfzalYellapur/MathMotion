@@ -7,7 +7,7 @@ interface GenerateButtonProps {
 
 export default function GenerateButton({ onGenerate, disabled }: GenerateButtonProps) {
   return (
-    <GlassyButton onClick={onGenerate} disabled={disabled}>
+    <GlassyButton onClick={onGenerate} disabled={disabled} background='bg-[#1e1e1e]'>
       Generate
     </GlassyButton>
   );

@@ -6,6 +6,7 @@ import useCodeExecution from "../../hooks/useCodeExecution";
 import ChatPanel from "./ChatPanel/ChatPanel";
 import MainPanel from "./MainPanel/MainPanel";
 import type { Message, ViewType } from "./types";
+import PageTransition from "../ui/PageTransition";
 
 function Workspace() {
     const [view, setView] = useState<ViewType>('editor');
@@ -52,35 +53,37 @@ function Workspace() {
     };
 
     return (
-        <div className="flex h-screen bg-black">
-            <ChatPanel
+        <PageTransition>
+            <div className="flex h-screen">
+                <ChatPanel
                 // messages={messages}
                 // // chatInput={chatInput}
                 // onChatInputChange={setChatInput}
                 // onSendMessage={handleSendMessage}
-            />
+                />
 
-            <MainPanel
-                view={view}
-                onViewChange={setView}
-                status={status}
-                onReconnect={connect}
-                isGenerating={isGenerating}
-                onGenerate={() => {
-                    if (status === 'Kernel Ready') {
-                        setIsGenerating(true);
-                        setVideoData(null);
-                        setCodeError(null);
-                        executeCode(userCode);
-                        setView("preview");
-                    }
-                }}
-                userCode={userCode}
-                onCodeChange={setUserCode}
-                videoData={videoData}
-                codeError={codeError}
-            />
-        </div>
+                <MainPanel
+                    view={view}
+                    onViewChange={setView}
+                    status={status}
+                    onReconnect={connect}
+                    isGenerating={isGenerating}
+                    onGenerate={() => {
+                        if (status === 'Kernel Ready') {
+                            setIsGenerating(true);
+                            setVideoData(null);
+                            setCodeError(null);
+                            executeCode(userCode);
+                            setView("preview");
+                        }
+                    }}
+                    userCode={userCode}
+                    onCodeChange={setUserCode}
+                    videoData={videoData}
+                    codeError={codeError}
+                />
+            </div>
+        </PageTransition>
     );
 }
 

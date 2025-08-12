@@ -28,7 +28,6 @@ export default function VideoPreview({ videoData, codeError }: VideoPreviewProps
   }
   else {
     return (<div className="h-full bg-black flex items-center justify-center text-lg font-semibold text-white/80">
-      {/* No preview available. */}
     </div>);
   }
 
