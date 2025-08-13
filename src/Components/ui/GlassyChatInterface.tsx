@@ -9,7 +9,7 @@ type Message = {
 
 // --- Main App Component ---
 export default function GlassyChatInterface() {
-    const [messages, setMessages] = useState<Message[]>([
+    const [messages] = useState<Message[]>([
         { role: 'ai', text: 'Hello! How can I help you today?' },
         { role: 'user', text: 'Tell me about the glass UI theme we have here.' },
         { role: 'ai', text: 'Of course. It\'s a frosted glass effect using semi-transparent backgrounds and a backdrop blur. It gives the interface a modern, layered feel. The buttons and other elements have subtle 3D effects and magnification animations on hover to make them more interactive.' },

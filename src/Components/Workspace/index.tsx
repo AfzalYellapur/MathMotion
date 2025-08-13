@@ -1,19 +1,19 @@
-import { useState, useEffect } from "react";
-import { useLocation } from 'react-router-dom';
+import { useState } from "react";
+// import { useLocation } from 'react-router-dom';
 import useBinderKernel from "../../hooks/useBinderKernel";
 import useWebSocketHandler from "../../hooks/useWebSocketHandler";
 import useCodeExecution from "../../hooks/useCodeExecution";
 import ChatPanel from "./ChatPanel/ChatPanel";
 import MainPanel from "./MainPanel/MainPanel";
-import type { Message, ViewType } from "./types";
+import type { ViewType } from "./types";
 import PageTransition from "../ui/PageTransition";
 
 function Workspace() {
     const [view, setView] = useState<ViewType>('editor');
-    const location = useLocation();
-    const initialPrompt = location.state?.prompt || '';
-    const [chatInput, setChatInput] = useState(initialPrompt);
-    const [messages, setMessages] = useState<Message[]>([]);
+    // const location = useLocation();
+    // const initialPrompt = location.state?.prompt || '';
+    // const [chatInput, setChatInput] = useState(initialPrompt);
+    // const [messages, setMessages] = useState<Message[]>([]);
     const [userCode, setUserCode] = useState('');
     const [videoData, setVideoData] = useState<string | null>(null);
     const [codeError, setCodeError] = useState<string | null>(null);
@@ -34,33 +34,11 @@ function Workspace() {
         }
     });
 
-    // Handle initial prompt
-    useEffect(() => {
-        if (initialPrompt.trim()) {
-            handleSendMessage();
-        }
-    }, []); // Run once on mount
-
-    const handleSendMessage = () => {
-        if (chatInput.trim() === '') return;
-
-        setMessages(prev => [
-            ...prev,
-            { sender: 'user', text: chatInput },
-            { sender: 'ai', text: `You said: ${chatInput}` }
-        ]);
-        setChatInput('');
-    };
 
     return (
         <PageTransition>
             <div className="flex h-screen">
-                <ChatPanel
-                // messages={messages}
-                // // chatInput={chatInput}
-                // onChatInputChange={setChatInput}
-                // onSendMessage={handleSendMessage}
-                />
+                <ChatPanel />
 
                 <MainPanel
                     view={view}

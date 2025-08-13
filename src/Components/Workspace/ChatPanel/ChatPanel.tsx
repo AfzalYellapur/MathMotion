@@ -1,4 +1,4 @@
-import type { Message } from '../types/index';
+// import type { Message } from '../types/index';
 import GlassyChatbox from '../../ui/GlassyChatBox';
 import GlassyChatInterface from '../../ui/GlassyChatInterface';
 
