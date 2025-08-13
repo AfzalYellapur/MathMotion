@@ -1,16 +1,12 @@
 import React, { useState } from 'react';
 import GlassyButton from './GlassyButton';
-import { useNavigate } from 'react-router-dom';
-interface GlassyChatBoxProps {
+interface GlassyChatBoxProps{
     placeholder?: string;
+    onClick?:()=>void;
 }
 
-export default function GlassyChatbox({ placeholder }: GlassyChatBoxProps) {
+export default function GlassyChatbox({placeholder, onClick}:GlassyChatBoxProps) {
     const [prompt, setPrompt] = useState('');
-    const navigate = useNavigate();
-    const handleenter = () => {
-        navigate('/workspace');
-    };
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
@@ -30,15 +26,13 @@ export default function GlassyChatbox({ placeholder }: GlassyChatBoxProps) {
                 />
                 {/* Send button */}
                 <div className="absolute top-4 right-4">
-                    <GlassyButton onClick={() => {
-                        handleenter;
-                    }}>
+                    <GlassyButton onClick={onClick}>
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-                            className="text-white/80 w-5 h-5">
-                            <path d="M5 12h14" />
-                            <path d="m12 5 7 7-7 7" />
+                             viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                             className="text-white/80 w-5 h-5">
+                            <path d="M5 12h14"/>
+                            <path d="m12 5 7 7-7 7"/>
                         </svg>
                     </GlassyButton>
                 </div>

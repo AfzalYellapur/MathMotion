@@ -5,7 +5,9 @@ import GlassyButton from "../ui/GlassyButton";
 import PageTransition from "../ui/PageTransition";
 function Landing() {
     const navigate = useNavigate();
-
+    const handleSendpr =()=>{
+        navigate('/workspace');
+    };
     const handleLogin = () => {
         navigate('/signin');
     };
@@ -43,7 +45,7 @@ function Landing() {
                 <p className="font-pixelify font-semibold text-xl text-neutral-300/90 mb-5">
                     Turn complex concepts into easy-to-grasp visuals
                 </p>
-                <GlassyChatbox placeholder="Type your concept here and we will bring it to life..." />
+                <GlassyChatbox onClick={handleSendpr} placeholder="Type your concept here and we will bring it to life..." />
             </div>
         </PageTransition>
     );
