@@ -9,7 +9,7 @@ export default function GlassyChatbox({ placeholder }: GlassyChatBoxProps) {
     const [prompt, setPrompt] = useState('');
     const navigate = useNavigate();
     const handleenter = () => {
-        navigate('/signup');
+        navigate('/workspace');
     };
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (e.key === 'Enter' && !e.shiftKey) {
@@ -32,7 +32,6 @@ export default function GlassyChatbox({ placeholder }: GlassyChatBoxProps) {
                 <div className="absolute top-4 right-4">
                     <GlassyButton onClick={() => {
                         handleenter;
-                        setPrompt('');
                     }}>
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                             viewBox="0 0 24 24" fill="none" stroke="currentColor"
