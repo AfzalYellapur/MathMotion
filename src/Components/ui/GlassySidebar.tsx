@@ -1,27 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import GlassyButton from './GlassyButton';
-// --- Main App Component ---
-// export default function App() {
 
-//     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
-
-
-
-//     return (
-//         <>
-//             <div className="min-h-screen bg-black flex font-sans overflow-hidden">
-//                 <GlassySidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
-//             </div>
-//         </>
-//     );
-// }
-
-// interface GlassySidebarProps{
-//     isOpen: boolean;
-//     setIsOpen:(isOpen:boolean)=>void;
-// }
 export default function GlassySidebar  () {
     const mockChats = ["Glass UI Discussion", "Framer Motion Tips", "React Best Practices", "Tailwind CSS Tricks"];
     const [isOpen, setIsOpen] = useState(false);
@@ -42,7 +22,7 @@ export default function GlassySidebar  () {
                         exit={{ opacity: 0, x: -20 }}
                         transition={{ duration: 0.3 }}
                         onMouseEnter={() => setIsOpen(true)}
-                        className="fixed bottom-4 left-4 z-30 w-12 h-12 rounded-full flex items-center justify-center
+                        className="fixed bottom-4 left-4 w-12 h-12 rounded-full flex items-center justify-center
                              bg-zinc-900/50 backdrop-blur-md border border-white/10 
                              shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),inset_0_-1px_1px_rgba(0,0,0,0.15)]"
                     >
@@ -59,7 +39,7 @@ export default function GlassySidebar  () {
                 animate={{ x: isOpen ? '0%' : '-100%' }}
                 initial={{ x: '-100%' }}
                 transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                className="fixed top-0 left-0 h-full w-80 p-4 z-40
+                className="fixed top-0 left-0 h-full w-60 p-4 z-40
                            bg-zinc-900/50 backdrop-blur-md border-r border-white/10 
                            bg-gradient-to-b from-white/10 to-transparent 
                            shadow-[inset_0_1px_1px_rgba(255,255,255,0.15),inset_0_-1px_1px_rgba(0,0,0,0.1)]"
